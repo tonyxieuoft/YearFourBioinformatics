@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 from Bio import Entrez
 import re
 
-from basic_tools.lists_and_files import list_to_string_csv
+from Basic_Tools.lists_and_files import list_to_string_csv
 
 
 NCBI_CALL_ATTEMPTS = 5

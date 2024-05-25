@@ -1,7 +1,7 @@
 import os
 
-from prepare_for_blast.get_longest_transcript import get_longest_transcript
-from basic_tools.numeric_user_input import numeric_user_input
+from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
+from Basic_Tools.numeric_user_input import numeric_user_input
 
 
 def fill_in_missing_genes(gene_folder: str, gene_path: str, species_name: str,

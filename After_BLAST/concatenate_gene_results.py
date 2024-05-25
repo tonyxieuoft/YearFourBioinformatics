@@ -1,10 +1,10 @@
 import os
-from after_blast.concatenate_exons import concatenate_exons
+from After_BLAST.concatenate_exons import concatenate_exons
 
 
 def concatenate_gene_results(blast_path, save_path):
 
-    save_dir = save_path + "\\" + "organized_blast_results2"
+    save_dir = save_path + "\\" + "organized_blast_results3"
     os.mkdir(save_dir)
     for gene in os.listdir(blast_path):
         gene_file = open(save_dir + "\\" + gene + ".fas", "a")
@@ -19,6 +19,6 @@ def concatenate_gene_results(blast_path, save_path):
 
 if __name__ == "__main__":
 
-    blast_path = r"C:\Users\tonyx\Downloads\api_pull_complete_results7"
+    blast_path = r"C:\Users\tonyx\Downloads\blast_test_results123456789101112131415161718"
     save_path = r"C:\Users\tonyx\Downloads"
     concatenate_gene_results(blast_path, save_path)

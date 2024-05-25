@@ -1,4 +1,4 @@
-from NCBI_Exon_Puller.api_based_strategy import file_to_list
+from Basic_Tools.lists_and_files import file_to_list
 
 
 def concatenate_exons(fasta_path):
@@ -9,7 +9,7 @@ def concatenate_exons(fasta_path):
     section_no = 0
     while len(sections[section_no]) < 6 or sections[section_no][:6] != "genome":
         section_no += 1
-    exon_section = section_no + 2
+    exon_section = section_no + 1
 
     global_beginning = sections[exon_section].split("-")[0]
 

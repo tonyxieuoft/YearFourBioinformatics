@@ -1,13 +1,20 @@
 import os
 
-from ncbi_exon_puller.ncbi_exon_puller import ncbi_get_gene_sequence
+from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from Bio import Entrez
-from basic_tools.xml_extraction import xml_to_dictionary
+from Basic_Tools.xml_extraction import xml_to_dictionary
 
 SEQUENCE_INDICES_FROM_MRNA_TAG = 2
 
 
 def get_directory(parent_directory: str, directory_name: str) -> str:
+    """
+    Returns the directory specified by
+
+    :param parent_directory:
+    :param directory_name:
+    :return:
+    """
 
     directory_path = parent_directory + "\\" + directory_name
     if not os.path.isdir(directory_path):

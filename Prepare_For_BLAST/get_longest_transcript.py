@@ -1,5 +1,5 @@
 import os
-from basic_tools.lists_and_files import file_to_list
+from Basic_Tools.lists_and_files import file_to_list
 
 
 def get_longest_transcript(directory):
