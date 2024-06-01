@@ -5,9 +5,10 @@ from selenium import webdriver
 from selenium.common import WebDriverException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from test_fileread import parse_blast_xml
+from assemble_blast_result_sequences import parse_blast_xml
 
 WAIT_CONSTANT = 0.1
 MAX_NUM_TABS = 2
@@ -60,9 +61,10 @@ def clicking_wrapper(overall_driver, specific_driver, by_what, description,
                         description)
 
 
-def get_element(specific_driver, by_what, description, timer_limit) -> object:
+def get_element(specific_driver, by_what, description, timer_limit) -> \
+        WebElement:
     """
-    Wait until an element is present, then get the element as an object.
+    Wait until an element is present, then get the element as an WebElement.
 
     :param specific_driver: driver, which allows for narrowing of the scope of
     elements searched for
@@ -70,7 +72,7 @@ def get_element(specific_driver, by_what, description, timer_limit) -> object:
     search for the element
     :param description: the description of the element, ex. its xpath
     :param timer_limit: amount of time to attempt for
-    :return: the element as an object
+    :return: the element as an WebElement
     """
 
     counter = 0
@@ -202,7 +204,7 @@ if __name__ == "__main__":
 
     # this part will be in the user-inputted main program
     user_specified_path = r'C:\Users\tonyx\Downloads'
-    # directory of files containing query sequences to blast. The taxa to blast
+    # directory of files containing query sequences to blast. The subject_taxa to blast
     # against are in the title
     rt_directory_path = r'C:\Users\tonyx\Downloads\test_taxa4' # CSV file
 
@@ -233,7 +235,7 @@ if __name__ == "__main__":
     # blasted before
     species_so_far = {}
 
-    # another file, specifying the order of the taxa to be searched in
+    # another file, specifying the order of the subject_taxa to be searched in
     # this is NON-trivial, since once a species has been BLASTED, it will not
     # be BLASTED again, even if a different query sequence is being used.
     ordered_taxa_path = r"C:\Users\tonyx\Downloads\ordered_taxa.txt"
@@ -256,7 +258,7 @@ if __name__ == "__main__":
         search_bar.send_keys(Keys.BACKSPACE)
         # sometimes the page changes
         search_bar = driver.find_element(By.ID, "taxonomy_autocomplete")
-        # search with the taxa (name of the query file)
+        # search with the subject_taxa (name of the query file)
         search_bar.send_keys(taxa)
         search_bar.send_keys(Keys.RETURN)
 
@@ -350,7 +352,7 @@ if __name__ == "__main__":
                 ActionChains(driver).move_by_offset(10, 10).click().perform()
 
         # after blast searches have been run on every available species in the
-        # taxa, winds down and collects results from the remaining tabs that
+        # subject_taxa, winds down and collects results from the remaining tabs that
         # are running
         for i in range(tabs_open, 0, -1):
 

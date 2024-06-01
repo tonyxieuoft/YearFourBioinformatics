@@ -1,6 +1,6 @@
 import os
 import time
-from typing import List, Dict, Tuple
+from typing import Iterable, List, Dict, Tuple
 from Bio import Entrez
 import re
 
@@ -25,7 +25,7 @@ def file_to_list(filepath: str) -> List:
     return output
 
 
-def list_to_string_csv(lst: List[object]) -> str:
+def list_to_string(lst: Iterable[object], delim) -> str:
     """
     Converts a list to a string, with each index separated by a comma
     :param lst: the list to convert
@@ -38,6 +38,7 @@ def list_to_string_csv(lst: List[object]) -> str:
             string = item
             first = False
         else:
-            string = string + "," + item
+            string = string + delim + item
 
     return string
+

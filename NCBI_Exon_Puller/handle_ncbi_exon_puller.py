@@ -2,7 +2,7 @@ import os
 from typing import List, Tuple
 from Bio import Entrez
 
-from basic_tools.lists_and_files import file_to_list
+from Basic_Tools.lists_and_files import file_to_list
 
 from ncbi_exon_puller import ncbi_exon_puller
 

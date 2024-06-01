@@ -1,10 +1,16 @@
 import xml.etree.ElementTree as ET
 
 
-def xml_to_dictionary(file):
+def file_xml_to_dictionary(file):
 
     tree = ET.parse(file)
     root = tree.getroot()
+    return {root.tag: xml_to_dictionary_recursive(root)}
+
+
+def string_xml_to_dictionary(xmlstring):
+
+    root = ET.fromstring(xmlstring)
     return {root.tag: xml_to_dictionary_recursive(root)}
 
 

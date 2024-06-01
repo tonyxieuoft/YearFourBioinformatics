@@ -2,7 +2,7 @@ import os
 
 from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from Bio import Entrez
-from Basic_Tools.xml_extraction import xml_to_dictionary
+from Basic_Tools.xml_extraction import file_xml_to_dictionary
 
 SEQUENCE_INDICES_FROM_MRNA_TAG = 2
 
@@ -27,7 +27,7 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
 
-    results_dict = xml_to_dictionary(file)
+    results_dict = file_xml_to_dictionary(file)
     iterations = results_dict['BlastOutput']['BlastOutput_iterations']
     for iteration in iterations:
         print(iteration['Iteration_iter-num'])

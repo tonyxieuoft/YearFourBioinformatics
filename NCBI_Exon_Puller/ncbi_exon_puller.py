@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 from Bio import Entrez
 import re
 
-from Basic_Tools.lists_and_files import list_to_string_csv
+from Basic_Tools.lists_and_files import list_to_string
 
 
 NCBI_CALL_ATTEMPTS = 5
@@ -241,7 +241,7 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
     # search NCBI to get relevant accession numbers, then obtain summaries for
     # each accession
     search_results = ncbi_gene_search(search_query)
-    ids = list_to_string_csv(search_results["IdList"])
+    ids = list_to_string(search_results["IdList"], ",")
     summaries = ncbi_get_gene_page_summaries(ids)
 
     # summary_no is the current summary we are on
