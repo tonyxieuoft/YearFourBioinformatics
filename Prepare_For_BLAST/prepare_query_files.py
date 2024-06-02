@@ -1,9 +1,9 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 from Basic_Tools.numeric_user_input import numeric_user_input
-from taxonomy_browser import get_taxonomy_lineage
+from Prepare_For_BLAST.taxonomy_browser import get_taxonomy_lineage
 from Basic_Tools.lists_and_files import file_to_list, list_to_string
 from Basic_Tools.basic_dictionaries import dict_get_values
 
@@ -119,9 +119,9 @@ def select_fill_in_auto(species_name, available_species: List[Dict],
     return closest_species
 
 
-def make_one_query_file(autofill, species_name: str, taxa: str,
-                        reference_seq_path: str, save_path: str,
-                        lineage_dict) -> None:
+def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
+                                    reference_seq_path: str, save_path: str,
+                                    lineage_dict) -> None:
     """
     Assumes that exons for reference sequences have been pulled out and are in
     the folder format: general folder -> gene -> taxon -> species -> transcript.
@@ -286,9 +286,8 @@ def get_lineage_dict_and_taxid_codes(taxa_to_species_dict: Dict) -> [Dict, Dict]
     # ideally, only call get_taxonomy_lineage once, because it takes time to
     # contact the website
     species_string = list_to_string(taxa_list + species_list, "\n")
-    print("scraping...")
+    print("contacting the NCBI taxonomy API...")
     lineage_dict = get_taxonomy_lineage(species_string)
-    print("done scraping")
 
     # a dictionary where keys are taxa and values are taxids corresponding to
     # the taxa
@@ -339,7 +338,7 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
 
 
 def prepare_query_files(auto_assign, auto_fill_in, ref_seq_path, save_path) \
-        -> None:
+        -> Tuple[List[str], Dict]:
     """
     Prepare query files based on reference sequences pulled using the
     NCBI_Exon_Puller module.
@@ -369,9 +368,13 @@ def prepare_query_files(auto_assign, auto_fill_in, ref_seq_path, save_path) \
     # it to use in BLAST. Sometimes, the reference species are missing sequences
     # for specific genes, and automatic/manual pulling from other available
     # species is offered.
+    ordered_taxa_to_be_blasted = []
     for assignment in assignments:
-        make_one_query_file(auto_fill_in, assignment[0], assignment[1],
-                            ref_seq_path, save_path, lineage_dct)
+        concatenate_sequences_one_query(auto_fill_in, assignment[0], assignment[1],
+                                        ref_seq_path, save_path, lineage_dct)
+        ordered_taxa_to_be_blasted.append(assignment[1])
+
+    return ordered_taxa_to_be_blasted, taxa_to_species_dict
 
 
 if __name__ == "__main__":
@@ -379,7 +382,8 @@ if __name__ == "__main__":
     path = r"C:\Users\tonyx\Downloads\api_pull_complete_results8"
     save_path = r"C:\Users\tonyx\Downloads\test_taxa6"
 
-    if not os.path.isdir(save_path):
-        os.mkdir(save_path)
-    print(prepare_query_files(1, 1, path, save_path))
+    #if not os.path.isdir(save_path):
+    #    os.mkdir(save_path)
+    #print(prepare_query_files(1, 1, path, save_path))
+    print(get_reference_species(r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results (2)'))
 

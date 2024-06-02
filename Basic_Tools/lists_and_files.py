@@ -28,6 +28,7 @@ def file_to_list(filepath: str) -> List:
 def list_to_string(lst: Iterable[object], delim) -> str:
     """
     Converts a list to a string, with each index separated by a comma
+
     :param lst: the list to convert
     :return: a comma-separated string
     """
@@ -35,10 +36,42 @@ def list_to_string(lst: Iterable[object], delim) -> str:
     string = ""
     for item in lst:
         if first:
-            string = item
+            string = str(item)
             first = False
         else:
-            string = string + delim + item
+            string = string + delim + str(item)
 
     return string
 
+
+def unique_filepath(file_path: str) -> str:
+    """
+    Return a unique filename by adding an increment version to the end of the
+    provided filename. For example, if the file 'filename' exists, this function
+    will check to see if 'filename (1)' exists as a name and return it if not.
+    Otherwise, will keep incrementing the version to 'filename (2)',
+    'filename (3)', etc.
+
+    :param file_path: name of the file to find a unique name for
+    :return: the filename with a unique increment version attached to the end
+    """
+    if not os.path.exists(file_path):
+        return file_path
+
+    else:
+        iteration = 1
+        altered_name = file_path + " (" + str(iteration) + ")"
+        while os.path.exists(altered_name):
+            iteration += 1
+            altered_name = file_path + " (" + str(iteration) + ")"
+
+        return altered_name
+
+
+def make_unique_directory(parent, name):
+
+    dir_path = parent + "\\" + name
+    dir_path = unique_filepath(dir_path)
+    os.mkdir(dir_path)
+
+    return dir_path

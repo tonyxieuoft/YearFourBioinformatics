@@ -4,7 +4,7 @@ from Bio import Entrez
 
 from Basic_Tools.lists_and_files import file_to_list
 
-from ncbi_exon_puller import ncbi_exon_puller
+from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_exon_puller
 
 NCBI_CALL_ATTEMPTS = 5
 
@@ -28,15 +28,12 @@ def parse_gene_input_line(gene_line: str) -> Tuple[List[str], List[str]]:
         # each query is either g or d, then a colon, the the query keywords
         search_specs = search_parameter.split(":")
 
-        if len(search_specs) != 2 or search_specs[0] not in ["g", "d"]:
-            raise UserInputException("queries must begin with 'g' or 'd'")
-        else:
-            # gene name
-            if search_specs[0] == "g":
-                gene_queries.append(search_specs[1].upper())
-            # gene description
-            elif search_specs[0] == "d":
-                description_queries.append(search_specs[1].upper())
+        # gene name
+        if search_specs[0].strip() == "g":
+            gene_queries.append(search_specs[1].strip().upper())
+        # gene description
+        elif search_specs[0] == "d":
+            description_queries.append(search_specs[1].strip().upper())
 
     return gene_queries, description_queries
 
@@ -70,8 +67,6 @@ def build_search_query(gene_queries: List[str], description_queries: List[str],
 
 
 def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
-
-    os.mkdir(save_path)
 
     # parse user input (every gene line in genes_lines corresponds to a set of
     # queries for a particular gene) - see documentation for more
