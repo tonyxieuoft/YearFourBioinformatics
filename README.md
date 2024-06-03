@@ -14,9 +14,9 @@ The program offers automated functionality for two major use cases:
 
 When running the main program, the following will occur sequentially:
 1) The program first asks the user for basic information (username, directory to download to)
-2) Given user-inputted lists of genes and taxa, the program pulls out all available exon information from NCBI and directs it to an output file (skippable)
+2) (skippable) Given user-inputted lists of genes and taxa, the program pulls out all available exon information from NCBI and directs it to an output file. Contact with the NCBI server is achieved through the Entrez API. 
 3) The program organizes seuqences pulled out in step 2 (or during a previous iteration of the program) into query files in preparation for BLAST.
-4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa.
+4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa. To do so, the program utilizes a Selenium-based webdriver and emulates a web user. 
 5) Finally, the program concatenates the results and outputs alignments by gene.
 
 Details for steps 2-5 are provided below. 
@@ -59,14 +59,19 @@ The following markers are available:
 
 # Preparing query files for BLAST.
 
-To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. To ensure query sequences are as similar to the subject genome as possible, the user can select the option for the program to automatically assign available reference query sequences to subject genomes only within the sub-branch of the taxa they are most similar to. How the program does this is as follows:
-1) Select an 
+To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. To ensure query sequences are as similar to the subject genome as possible, the user can select the option for the program to automatically assign available reference query sequences to subject genomes only within the sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
+1) Select an arbitary reference species S1 and assign it to the overarching taxon
+2) Select a different reference species S2 and assign it to the largest taxon T within its lineage such that T is not in the lineage of another reference species that has already been selected.
+3) Repeat step 3 for species S3, S4 ... until all reference species have been assigned a taxon. 
 
-Alternatively, the user can specify these assignments manually. Consider the following example: 
-
+Consider the following example: 
 ```
-Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species: Caracharadon carcharias, Amblyraja radiata and Hemiscyllium ocellatum.
+Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species:
+Caracharadon carcharias, Amblyraja radiata and Hemiscyllium ocellatum.
+'''
 
+
+Alternatively, the user can specify these assignments manually. 
  
 
  
