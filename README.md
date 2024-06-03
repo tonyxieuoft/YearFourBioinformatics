@@ -16,7 +16,7 @@ When running the main program, the following will occur sequentially:
 1) The program first asks the user for basic information (username, directory to download to)
 2) (skippable) Given user-inputted lists of genes and taxa, the program pulls out all available exon information from NCBI and directs it to an output file. Contact with the NCBI server is achieved through the Entrez API. 
 3) The program organizes seuqences pulled out in step 2 (or during a previous iteration of the program) into query files in preparation for BLAST.
-4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa. To do so, the program utilizes a Selenium-based webdriver and emulates a web user. 
+4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa. To do so, the program utilizes a Selenium-based webdriver to emulate a web user. 
 5) Finally, the program concatenates the results and outputs alignments by gene.
 
 Details for steps 2-5 are provided below. 
@@ -109,6 +109,19 @@ For speed's sake, pulled sequences for all genes for a given reference species a
 
 # Automatic NCBI BLAST
 
+No input files are required for this part. Everything will ahve been handled by the section of the pipeline right above that handles preparing for BLAST. The user can specify custom BLAST parameters, which include:
+- expect threshold
+- word size
+
+Please note that a Selenium-based webdriver will be used to run this part of the program. A pop-up chrome tab will appear: DO NOT CLOSE IT, unless you wish to terminate the program. THe program emulates a web-user, and accesses NCBI BLAST directly from a web browser. When the program runs to completion, all downloaded files and opened tabs will be automatically closed. 
+
+TODO: accessing BLAST via CLOUD services or locally, after eukaryotic genomes have been downloaded to the local server.
+
+# After BLAST
+
+No input files are required for this section. Here, results from BLAST are automatically concatenated into gene alignments. 
+
+TODO: automate alignment algorithms like ClustalW
 
 
 
