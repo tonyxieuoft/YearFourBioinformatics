@@ -62,17 +62,19 @@ The following markers are available:
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. To ensure query sequences are as similar to the subject genome as possible, the user can select the option for the program to automatically assign available reference query sequences to subject genomes only within the sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
 1) Select an arbitary reference species S1 and assign it to the overarching taxon.
 2) Select a different reference species S2 and assign it to the largest taxon *T* within its lineage such that *T* is not in the lineage of another already-selected reference species.
-3) Repeat step 3 for species S3, S4 ... until all reference species have been assigned a taxon. 
+3) Repeat step 3 for species S3, S4 ... until all reference species have been assigned a taxon.
 
-I'll use the following example to make this clearer: 
+The order in which these sub-taxa will be blasted is the reverse order that they were assigned, and species that have been blasted are not blasted again. I'll use the following example to make the algorithm clearer: 
 ```
-Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species: Carcharodon
-carcharias, Amblyraja radiata and Hemiscyllium ocellatum. The lineages for each species is as follows:
-Ch
+Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species:
+Carcharodon carcharias (1), Amblyraja radiata (2) and Hemiscyllium ocellatum (3). The lineages for each species is as follows:
+(1) Carcharodon -> Lamninae -> Alopiidae -> Lamniformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
+(2) Amblyraja -> Rajidae -> Rajiformes -> Batoidea -> Elasmobranchii
+(3) Hemiscyllium -> Hemiscylliidae > Orectolobiformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
 '''
 
 
-Alternatively, the user can specify these assignments manually. 
+Given these issues, the user can specify these assignments manually. 
  
 
  
