@@ -57,7 +57,7 @@ The following markers are available:
 - `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
 - `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
 
- For genes are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
+ For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
 
  ### Output directory
 
