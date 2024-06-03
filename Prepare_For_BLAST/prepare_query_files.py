@@ -121,7 +121,7 @@ def select_fill_in_auto(species_name, available_species: List[Dict],
 
 def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                                     reference_seq_path: str, save_path: str,
-                                    lineage_dict) -> None:
+                                    lineage_dict) -> bool:
     """
     Assumes that exons for reference sequences have been pulled out and are in
     the folder format: general folder -> gene -> taxon -> species -> transcript.
@@ -136,11 +136,14 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
     :param reference_seq_path: the general folder containing reference sequences
     :param save_path: str
     :param taxa: the subject_taxa that the query will be blasted against
-    :return: nothing. a file will be created in the specified save_path
+    :return: True iff the species has reference sequences for every
+    specified gene. Also, a file will be created in the specified save_path
     """
 
     # query file to contain reference sequences to blast against a taxon
     file = open(save_path + "\\" + taxa + ".fas", "a")
+
+    complete_species = True
 
     # follows through the folder structure
     for gene_folder in os.listdir(reference_seq_path):
@@ -170,6 +173,7 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                         species_found = True
 
         if not species_found:
+            complete_species = False
             # determine the alternative species to pull from
             if autofill == 1:
                 # automatic
@@ -186,6 +190,8 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                 file.write(open(transcript_path, "r").read() + "\n")
             else:
                 print("Something went wrong")
+
+    return complete_species
 
 
 def get_reference_species(ref_seq_path: str) -> Dict:
@@ -338,7 +344,7 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
 
 
 def prepare_query_files(auto_assign, auto_fill_in, ref_seq_path, save_path) \
-        -> Tuple[List[str], Dict]:
+        -> Tuple[List[str], List[str]]:
     """
     Prepare query files based on reference sequences pulled using the
     NCBI_Exon_Puller module.
@@ -369,12 +375,15 @@ def prepare_query_files(auto_assign, auto_fill_in, ref_seq_path, save_path) \
     # for specific genes, and automatic/manual pulling from other available
     # species is offered.
     ordered_taxa_to_be_blasted = []
+    complete_species = []
     for assignment in assignments:
-        concatenate_sequences_one_query(auto_fill_in, assignment[0], assignment[1],
-                                        ref_seq_path, save_path, lineage_dct)
+        if concatenate_sequences_one_query(auto_fill_in, assignment[0],
+                                           assignment[1], ref_seq_path,
+                                           save_path, lineage_dct):
+            complete_species.append(assignment[0])
         ordered_taxa_to_be_blasted.append(assignment[1])
 
-    return ordered_taxa_to_be_blasted, taxa_to_species_dict
+    return ordered_taxa_to_be_blasted, complete_species
 
 
 if __name__ == "__main__":

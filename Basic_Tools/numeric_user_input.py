@@ -19,3 +19,5 @@ def numeric_user_input(lower_range: int, upper_range: int, first_prompt: str,
             user_input = int(input(following_prompt))
 
     return user_input
+
+

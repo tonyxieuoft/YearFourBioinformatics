@@ -43,13 +43,11 @@ def clicking_wrapper(overall_driver, specific_driver, by_what, description,
         try:
             # finds the element and attempts to click
             specific_driver.find_element(by_what, description).click()
-            print("successful click")
             break
         except WebDriverException:
             try:
                 # checks if survey has popped up, not allowing clicking
                 overall_driver.find_element(By.XPATH, "//button[text()[. = 'No Thanks']]").click()
-                print("survey denied")
             except WebDriverException:
                 pass
 
@@ -91,6 +89,17 @@ def get_element(specific_driver, by_what, description, timer_limit) -> \
                     description)
 
 
+def get_elements(driver: webdriver, by_what: str, description: str,
+                 timer_limit: int) -> List:
+
+    WebDriverWait(driver, timer_limit).until(
+        EC.presence_of_element_located((by_what, description)))
+    elements = driver.find_elements(by_what, description)
+
+    return elements
+
+
+
 def try_click(specific_driver, by_what, description) -> bool:
     """
     Attempts a click, returning True if successful and False otherwise.
@@ -106,6 +115,31 @@ def try_click(specific_driver, by_what, description) -> bool:
         return True
     except WebDriverException:
         return False
+
+
+def search_button_clicker(driver, timer_limit) -> None:
+    """
+    The button to click after entering a taxon to search is fickle sometimes
+    in that the click goes through, yet no change to the website occurs. This
+    function repeatedly clicks the search button until the next page is loaded.
+
+    :param driver: driver
+    :param timer_limit: time to keep attempting until an exception is thrown
+    :return: none
+    """
+
+    counter = 0
+    while counter < timer_limit:
+        try:
+            driver.find_element(By.ID, "panel-header")
+            break
+        except WebDriverException:
+            try_click(driver, By.XPATH, "//button[text()[. = 'Search']]")
+            time.sleep(WAIT_CONSTANT)
+            counter += WAIT_CONSTANT
+
+    if counter >= timer_limit:
+        raise DriverTimeoutException("search button clicking timeout")
 
 
 def blast_menu_button_clicker(driver, timer_limit) -> bool:
@@ -202,8 +236,70 @@ def juggle_blast_tabs(driver, by_what, description, num_tabs,
     return switch_counter
 
 
+def enter_taxa(driver: webdriver, taxa: str) -> None:
+    """
+    Enter taxa into the NCBI search bar.
+
+    :param driver: driver
+    :param taxa: taxa to enter into the search bar
+    :return: None
+    """
+    # get the search bar element, click on it, and delete anything in it
+    search_bar = get_element(driver, By.ID, "taxonomy_autocomplete", 40)
+    clicking_wrapper(driver, driver, By.ID, "taxonomy_autocomplete", 40)
+    search_bar.send_keys(Keys.BACKSPACE)
+    # sometimes the page changes, need to get the element again
+    search_bar = get_element(driver, By.ID, "taxonomy_autocomplete", 40)
+    # search with the subject_taxa (name of the query file)
+    search_bar.send_keys(taxa)
+    search_bar.send_keys(Keys.RETURN)
+    # click the search button to commence search
+    search_button_clicker(driver, 40)
+
+
+def configure_genomes_display(driver: webdriver) -> None:
+    """
+    Configure the NCBI datasets genome display to display only reference
+    genomes, and display a maxmimum of 100 results
+
+    :param driver: driver
+    :return: None
+    """
+    # clicks the filter menu
+    clicking_wrapper(driver, driver, By.ID, "panel-header", 40)
+    # selects for only reference genomes to be displayed
+    clicking_wrapper(driver, driver, By.XPATH, "//*[@value='reference_only']", 40)
+    # waits for the reference genome to be displayed
+    time.sleep(2)
+
+    # clicks the "number of results displayed" menu button
+    clicking_wrapper(driver, driver, By.CSS_SELECTOR,
+                     ".MuiSelect-select.MuiSelect-outlined.MuiInputBase-"
+                     "input.MuiOutlinedInput-input.css-zcubqt", 40)
+    # selects the maximum number of results that can be displayed (100)
+    clicking_wrapper(driver, driver, By.XPATH, "//li[@data-value='100']", 40)
+    time.sleep(2)
+
+
+def configure_expect_threshold(driver:webdriver, expect: str) -> None:
+    """
+    On the BLAST settings page, configure expect threshold
+
+    :param driver: driver
+    :param expect: user-entered expect threshold
+    :return: None
+    """
+
+    clicking_wrapper(driver, driver, By.ID, "btnDescrOver", 40)
+    expect_button = get_element(driver, By.ID, "expect", 40)
+    for i in range(5):
+        expect_button.send_keys(Keys.BACKSPACE)
+    expect_button.send_keys(str(expect))
+
+
 def driver_genome_blaster(save_path: str, queries_path: str,
-                          taxa_blast_order: List[str], reference_species: Dict):
+                          taxa_blast_order: List[str],
+                          complete_reference_species: List[str], expect_value):
     """
     Automated BLAST using a selenium driver. Pop-up chrome tabs will appear
     and files will be downloaded, but only the complete blast results will
@@ -234,9 +330,8 @@ def driver_genome_blaster(save_path: str, queries_path: str,
     # blasted before
     species_so_far = {}
     # these are for species we already have references for
-    for key in reference_species.keys():
-        for species in reference_species[key]:
-            species_so_far[species] = True
+    for species in complete_reference_species:
+        species_so_far[species] = True
     # the order of the subject_taxa to be searched is NON-trivial, since once a
     # species has been BLASTED, it will not be BLASTED again, even if a
     # different query sequence is being used.
@@ -244,83 +339,58 @@ def driver_genome_blaster(save_path: str, queries_path: str,
 
         # reference query path
         reference_filepath = queries_path + "\\" + taxa + ".fas"
-
-        # get the search bar element, click on it, and delete anything in it
-        search_bar = get_element(driver, By.ID, "taxonomy_autocomplete", 40)
-        clicking_wrapper(driver, driver, By.ID, "taxonomy_autocomplete", 40)
-        search_bar.send_keys(Keys.BACKSPACE)
-        # sometimes the page changes, need to get the element again
-        search_bar = get_element(driver, By.ID, "taxonomy_autocomplete", 40)
-        # search with the subject_taxa (name of the query file)
-        search_bar.send_keys(taxa)
-        search_bar.send_keys(Keys.RETURN)
-
-        time.sleep(3)
-        # need to fix this for button pressing
-
-        clicking_wrapper(driver, driver, By.XPATH, "//button[text()[. = 'Search']]", 40)
-        print("we already clicked this")
-
-        # clicks the filter menu
-        clicking_wrapper(driver, driver, By.ID, "panel-header", 40)
-        # selects for only reference genomes to be displayed
-        clicking_wrapper(driver, driver, By.XPATH, "//*[@value='reference_only']", 40)
-        # waits for the reference genome to be displayed
-        time.sleep(2)
-
-        # clicks the "number of results displayed" menu button
-        clicking_wrapper(driver, driver, By.CSS_SELECTOR,
-                         ".MuiSelect-select.MuiSelect-outlined.MuiInputBase-"
-                         "input.MuiOutlinedInput-input.css-zcubqt", 40)
-        # selects the maximum number of results that can be displayed (100)
-        clicking_wrapper(driver, driver, By.XPATH, "//li[@data-value='100']", 40)
-
-        time.sleep(2)
+        # search and enter taxa
+        enter_taxa(driver, taxa)
+        # configure settings for genome display
+        configure_genomes_display(driver)
         # gets the total number of rows to iterate over
-        WebDriverWait(driver, 40).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".MuiTableRow-root.css-1mc2v0b")))
-        table_rows = driver.find_elements(By.CSS_SELECTOR, ".MuiTableRow-root.css-1mc2v0b")
+        genome_table_rows = get_elements(driver, By.CSS_SELECTOR,
+                                  ".MuiTableRow-root.css-1mc2v0b", 40)
 
         tabs_open = 0
         # tracks which tabs correspond to which species (not directly evident on
         # the blast page
         species_open = []
 
-        for i in range(1, len(table_rows)):
+        for i in range(1, len(genome_table_rows)):
 
-            # waits for table results to show up, then finds all of them and -
-            # puts them in an array
-            WebDriverWait(driver, 40).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".MuiTableRow-root.css-1mc2v0b")))
-            table_rows = driver.find_elements(By.CSS_SELECTOR, ".MuiTableRow-root.css-1mc2v0b")
-            current_row = table_rows[i]
+            # need to get the genome table rows element
+            genome_table_rows = get_elements(driver, By.CSS_SELECTOR,
+                                      ".MuiTableRow-root.css-1mc2v0b", 40)
+            # the current species in the genome display we are on
+            current_row = genome_table_rows[i]
 
             taxon_name = get_element(current_row, By.XPATH,
                                      ".//a[@data-ga-label='taxon_name']",
                                      40).text
 
             if taxon_name in species_so_far.keys():
-                print("already searched: " + taxon_name)
-                # DO NOT BLAST AGAIN if a species has already been BLASTed
+                pass
+                # DO NOT BLAST AGAIN if a species has already been blasted
             else:
                 # open the menu
-                print("on: " + taxon_name)
+                print("on species: " + taxon_name)
                 species_so_far[taxon_name] = True
 
                 clicking_wrapper(driver, current_row, By.XPATH,
                                  ".//button[@data-ga-action='click_open_menu']", 40)
-                # wait until the menu item shows up
+
                 # if the species is blastable
                 if blast_menu_button_clicker(driver, 40):
 
+                    # a new BLAST tab opens -> enter necessary information
                     tabs_open += 1
                     species_open.append(taxon_name)
-                    print(species_open)
                     driver.switch_to.window(driver.window_handles[tabs_open])
 
+                    # blast page options
                     clicking_wrapper(driver, driver, By.XPATH, "//*[text()[. = 'Somewhat similar sequences (blastn)']]", 40)
                     file_input = get_element(driver, By.ID, "upl", 40)
                     file_input.send_keys(reference_filepath)
+
+                    if expect_value != 0:
+                        configure_expect_threshold(driver, expect_value)
+
                     clicking_wrapper(driver, driver, By.CLASS_NAME, "blastbutton", 40)
 
                 # if the maximum number of blast entries has been reached
@@ -378,14 +448,14 @@ def driver_genome_blaster(save_path: str, queries_path: str,
 
 if __name__ == "__main__":
 
-    blast_results_path = r'C:\Users\tonyx\Downloads\blast_test_again4'
+    blast_results_path = r'C:\Users\tonyx\Downloads\blast_test_again6'
     os.mkdir(blast_results_path)
     queries_path = r'C:\Users\tonyx\Downloads\query_files (4)'
     taxa_blast_order = ['9738', '9753', '9741', '9732', '9740', '40150', '9756', '119500', '90247', '27609', '9750', '9729', '30558', '9726', '9722', '2746895', '9771', '9721', '378069', '30483', '259919', '117887', '1158979', '117861', '117851', '170819', '30503', '119203', '7778']
     reference_species = {'cetacea': ['Balaenoptera acutorostrata', 'Balaenoptera musculus', 'Balaenoptera ricei', 'Delphinapterus leucas', 'Delphinus delphis', 'Eubalaena glacialis', 'Globicephala melas', 'Kogia breviceps', 'Lagenorhynchus albirostris', 'Lagenorhynchus obliquidens', 'Lipotes vexillifer', 'Mesoplodon densirostris', 'Monodon monoceros', 'Neophocaena asiaeorientalis asiaeorientalis', 'Orcinus orca', 'Phocoena sinus', 'Physeter catodon', 'Tursiops truncatus'], 'elasmobranchii': ['Amblyraja radiata', 'Carcharodon carcharias', 'Chiloscyllium plagiosum', 'Hemiscyllium ocellatum', 'Hypanus sabinus', 'Leucoraja erinacea', 'Mobula hypostoma', 'Pristis pectinata', 'Rhincodon typus', 'Scyliorhinus canicula', 'Stegostoma tigrinum']}
 
     driver_genome_blaster(blast_results_path, queries_path, taxa_blast_order,
-                          reference_species)
+                          reference_species, 0.1)
     pass
 
 

@@ -3,7 +3,7 @@ from Bio.Blast import NCBIWWW, NCBIXML
 def test(query_sequences):
 
     entrez_query = "txid9733[orgn]"
-    result_handle = NCBIWWW.qblast("blastn", "refseq_rna",
+    result_handle = NCBIWWW.qblast("blastn", "refseq_rna", query_sequences,
                                    entrez_query=entrez_query)
     # ref_euk_rep_genomes
     contents = open(result_handle).read()

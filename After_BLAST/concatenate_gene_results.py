@@ -1,21 +1,11 @@
 import os
 from After_BLAST.concatenate_exons import concatenate_exons
+from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 
 
 def concatenate_gene_results(exon_pull_path, blast_path, save_path):
 
-    for gene in os.listdir(exon_pull_path):
-        gene_file = open(save_path + "\\" + gene + ".fas", "a")
-        gene_path = exon_pull_path + "\\" + gene
-        for taxa in os.listdir(gene_path):
-            taxa_path = gene_path + "\\" + taxa
-            for species in os.listdir(taxa_path):
-                species_path = taxa_path + "\\" + species
-                for file in os.listdir(species_path):
-                    to_write = concatenate_exons(species_path + "\\" + file)
-                    gene_file.write(to_write)
-
-        gene_file.close()
+    blasted_species = {}
 
     for gene in os.listdir(blast_path):
         gene_file = open(save_path + "\\" + gene + ".fas", "a")
@@ -24,10 +14,26 @@ def concatenate_gene_results(exon_pull_path, blast_path, save_path):
             taxa_path = gene_path + "\\" + taxa
             for species in os.listdir(taxa_path):
                 species_path = taxa_path + "\\" + species
-                for file in os.listdir(species_path):
-                    to_write = concatenate_exons(species_path + "\\" + file)
+                blasted_species[species] = True
+                file_to_use = get_longest_transcript(species_path)
+                if file_to_use != "":
+                    to_write = concatenate_exons(species_path + "\\" + file_to_use)
                     gene_file.write(to_write)
 
+        gene_file.close()
+
+    for gene in os.listdir(exon_pull_path):
+        gene_file = open(save_path + "\\" + gene + ".fas", "a")
+        gene_path = exon_pull_path + "\\" + gene
+        for taxa in os.listdir(gene_path):
+            taxa_path = gene_path + "\\" + taxa
+            for species in os.listdir(taxa_path):
+                species_path = taxa_path + "\\" + species
+                if species not in blasted_species:
+                    file_to_use = get_longest_transcript(species_path)
+                    if file_to_use != "":
+                        to_write = concatenate_exons(species_path + "\\" + file_to_use)
+                        gene_file.write(to_write)
         gene_file.close()
 
 if __name__ == "__main__":

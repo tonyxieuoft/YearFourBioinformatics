@@ -25,42 +25,42 @@ def get_directory(parent_directory: str, directory_name: str) -> str:
 
 def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
 
-    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
-
     results_dict = file_xml_to_dictionary(file)
-    iterations = results_dict['BlastOutput']['BlastOutput_iterations']
-    for iteration in iterations:
-        print(iteration['Iteration_iter-num'])
-        query_title = iteration['Iteration_query-def'].split(" ")
-        query_seq_length = int(iteration['Iteration_query-len'])
+
+    exon_iterations = results_dict['BlastOutput']['BlastOutput_iterations']
+    for exon_iteration in exon_iterations:
+
+        query_title = exon_iteration['Iteration_query-def'].split(" ")
+        query_seq_length = int(exon_iteration['Iteration_query-len'])
         gene_name = query_title[0]
 
         mrna_section_no = 1
-        while len(query_title[mrna_section_no]) < 4 or \
-                query_title[mrna_section_no][:4] != "mRNA":
+        while len(query_title[mrna_section_no]) < len("mRNA") or \
+                query_title[mrna_section_no][:len("mRNA")] != "mRNA":
             mrna_section_no += 1
 
         ref_transcript_var = query_title[mrna_section_no].split(":")[1]
         ref_sequence_range = query_title[mrna_section_no +
                                          SEQUENCE_INDICES_FROM_MRNA_TAG]
 
-        if isinstance(iteration['Iteration_hits'], list) or \
-                isinstance(iteration['Iteration_hits'], dict): # if not empty
+        if isinstance(exon_iteration['Iteration_hits'], list) or \
+                isinstance(exon_iteration['Iteration_hits'], dict): # if not empty
 
-            if isinstance(iteration['Iteration_hits'], list):
-                top_hit = iteration['Iteration_hits'][0]
+            # get the top hit for the exon
+            if isinstance(exon_iteration['Iteration_hits'], list):
+                top_hit = exon_iteration['Iteration_hits'][0]
             else:
-                top_hit = iteration['Iteration_hits']['Hit']
-
+                top_hit = exon_iteration['Iteration_hits']['Hit']
+            # get the top sequence for the top hit
             if isinstance(top_hit["Hit_hsps"], list):
                 seq_data = top_hit["Hit_hsps"][0]
+                print("SOMETHING STRANGE: " + curr_species + " " + gene_name)
             else:
                 seq_data = top_hit["Hit_hsps"]["Hsp"]
 
             result_sequence = seq_data["Hsp_hseq"]
             query_bound1 = int(seq_data["Hsp_query-from"])
             query_bound2 = int(seq_data["Hsp_query-to"])
-
 
             missing_left = query_bound1 - 1
             missing_right = query_seq_length - query_bound2
@@ -110,7 +110,7 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
 
                     string = "-"*(missing_left - to_salvage) + string
 
-                    print("missing left recovered: " + string + " iteration: " + iteration['Iteration_iter-num'])
+                    print("missing left recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
                     result_sequence = string + result_sequence
 
@@ -147,7 +147,7 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
 
                     string = string + "-"*(missing_right - to_salvage)
 
-                    print("missing right recovered: " + string + " iteration: " + iteration['Iteration_iter-num'])
+                    print("missing right recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
                     result_sequence = result_sequence + string
 

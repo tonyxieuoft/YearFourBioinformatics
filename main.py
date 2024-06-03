@@ -1,16 +1,19 @@
 import os
+import time
+
 from Bio import Entrez
 from Bio.Blast import NCBIWWW
 
 from After_BLAST.concatenate_gene_results import concatenate_gene_results
-from Basic_Tools.lists_and_files import file_to_list, make_unique_directory, \
-    unique_filepath
+from Basic_Tools.lists_and_files import make_unique_directory
 from Basic_Tools.numeric_user_input import numeric_user_input
 
 # Press the green button in the gutter to run the script.
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
 from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import prepare_query_files
+from User_Interaction.expect_threshold_user_input import \
+    expect_threshold_user_input
 from User_Interaction.user_exon_pulling import enter_gene_filepath, \
     get_generic_directory, get_generic_filepath
 
@@ -44,66 +47,89 @@ if __name__ == '__main__':
         if not valid_directory:
             print("Invalid directory: " + download_dir)
 
-    print("Great! Now, we will begin pulling exons from NCBI. If you would "
-          "like to skip this step and start blasting immediately, enter 1. "
-          "Otherwise, to begin pulling exons from NCBI, enter 2.")
+    print("=======================================================")
+
+    print("Choose from the following options by entering the corresponding "
+          "number: \n"
+          "(1) BLAST immediately\n"
+          "(2) Pull exons from NCBI for reference species before starting BLAST")
 
     skip_pull_step = numeric_user_input(1, 2, "")
+    print("=======================================================")
+
     if skip_pull_step == 1:
         print("skipping exon pulling...")
         print("Enter a path to a directory containing reference sequences "
               "previously pulled out using the NCBI exon puller.")
         exon_pull_path = get_generic_directory()
     else:
+        # print statements for gene in the function itself
         gene_query_filepath = enter_gene_filepath()
-
-        print("Now, enter a valid file path containing taxa of interest.")
+        print("Enter a valid file path containing taxa of interest to pull for.")
         taxa_filepath = get_generic_filepath()
-
-        print("Ok, we are all set to pull reference sequences from "
-              "the specified taxa for the specified genes.")
 
         exon_pull_path = make_unique_directory(download_dir,
                                                "NCBI_exon_pull_results")
-        print("The results will be at the following path: " +
+        print("Ok, we are set to pull. The results will be at the following path: " +
               exon_pull_path)
+        print("Enter any button to continue")
+        input()
+
+        print("=======================================================")
 
         print("Starting NCBI Exon Puller...")
         handle_ncbi_exon_puller(exon_pull_path, gene_query_filepath,
                                 taxa_filepath)
         print("Finished pulling exons!")
 
-        termination_message = "Enter 1 to terminate the program here, or enter " \
-                              "2 to prepare for blast"
+        termination_message = "Enter: \n" \
+                              "(1) to terminate the program here\n" \
+                              "(2) to prepare for blast"
         if numeric_user_input(1, 2, termination_message) == 1:
             print("exiting...")
             exit(0)
     print("============================================")
     print("Now, we'll prepare query files for blasting.")
-    print("")
-    assign_message = "If you would to assign reference species to subject taxa " \
-                     "manually, enter 2. Otherwise, for automatic assignment, " \
-                     "enter 1."
+    print("============================================")
+    assign_message = "We assign reference species to sub-taxa of the " \
+                     "overarching taxon to be blasted to make sure query " \
+                     "sequences are as similar to the subject genome as " \
+                     "possible. Enter: \n" \
+                     "(1) for automatic assignment\n" \
+                     "(2) for manual assignment\n"
     auto_assign = numeric_user_input(1, 2, assign_message)
-
-    print("")
+    print("configuring settings...")
+    print("============================================")
     fill_in_message = "Sometimes, a reference species will not have sequences " \
                       "for certain genes. In cases where this occurs, the " \
                       "sequences from the closest available species will be " \
-                      "used instead. Enter 1 for this fill-in process to be " \
-                      "automatic. Enter 2 if you would like to manually select " \
-                      "the closest species during the fill-in process."
+                      "used instead. Enter: \n" \
+                      "(1) for this fill-in process to be automatic. \n" \
+                      "(2) for manual fill-in."
     auto_fill = numeric_user_input(1, 2, fill_in_message)
-
+    print("configuring settings...")
     queries_path = make_unique_directory(download_dir, "query_files")
     print("Great. Query files will be at the path: " + queries_path)
+    time.sleep(0.5)
     print("=============================================")
     print("Making query files...")
 
-    taxa_blast_order, reference_species = \
+    taxa_blast_order, complete_reference_species = \
         prepare_query_files(auto_assign, auto_fill, exon_pull_path, queries_path)
 
-    print(taxa_blast_order)
+    print("Done making query files!")
+    print("=============================================")
+    print("Configuring BLAST...")
+    print("Default expect threshold is 0.05. Enter:\n"
+          "(1) to proceed\n"
+          "(2) to enter a custom expect threshold")
+    expect_choice = numeric_user_input(1, 2, "", "Incorrect. Enter 1 or 2.")
+
+    expect_value = 0
+    if expect_choice == 2:
+        print("Enter an expect threshold value. It must be greater than 0 and "
+              "less than or equal to 1.")
+        expect_value = expect_threshold_user_input()
 
     blast_results_path = make_unique_directory(download_dir, "blast_results")
     print("Blast results will be at the path: " + blast_results_path)
@@ -112,7 +138,7 @@ if __name__ == '__main__':
 
     NCBIWWW.email = email
     driver_genome_blaster(blast_results_path, queries_path, taxa_blast_order,
-                          reference_species)
+                          complete_reference_species, expect_value)
 
     print("BLAST complete.")
     print("=============================================")
