@@ -101,7 +101,7 @@ non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effective
 ```
 ### Manual assignment of reference species to sub-taxa
 
-Much more goes in phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
+Much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
 ```
 reference_species1,sub_taxa1
 reference_species2,sub_taxa2
