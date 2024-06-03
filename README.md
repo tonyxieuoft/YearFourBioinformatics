@@ -59,7 +59,11 @@ The following markers are available:
 
 # Preparing query files for BLAST.
 
-To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. To ensure query sequences are as similar to the subject genome as possible, the user can select the option for the program to automatically assign available reference query sequences to blast against subject genomes only within the sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
+To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
+
+### Automatic assignment of reference species to sub-taxa
+
+To ensure query sequences are as similar to the subject genome as possible yet altogether cover the entire taxa, the user can select the option for the program to automatically assign available reference query sequences to blast against subject genomes only within a sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
 1) Select an arbitary reference species S1 and assign it to the overarching taxon.
 2) Select a different reference species S2 and assign it to the largest taxon *T* within its lineage such that *T* is not in the lineage of another already-selected reference species.
 3) Repeat step 3 for species S3, S4 ... until all reference species have been assigned a taxon.
@@ -89,12 +93,25 @@ Then, as the genomes of species that have been already blasted are not blasted a
 sequences are used to query against non-Lamniforme Selachii genomes. Finally, Amblyraja radiata sequences query
 non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effectively blasted only against Batoidea. 
 ```
+### Manual assignment of reference species to sub-taxa
 
-Note that much more goes in phylogenetic analysis than purely clade and lineage information, and the algorithm 
-only crudely estimates the most appropriate reference sequence for a given taxon. If the user is willing to spend 
-more time, they can specify these assignments manually to increase accuracy. The format of the file used to give
-assignment commands is as follows:
+Much more goes in phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
 ```
- 
+reference_species1,sub_taxa1
+reference_species2,sub_taxa2
+reference_species3,sub_taxa3
+...
+```
+
+### Filling in missing genes
+
+For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
+
+# Automatic NCBI BLAST
+
+
+
+
+
 
  
