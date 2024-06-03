@@ -8,6 +8,10 @@ The following must be installed:
 
 More specifically, BioPython is required to access the NCBI Entrez API, and Selenium is required for the web-driver based automation of NCBI BLAST.
 
+## Usage
+
+Ensure the requirements are met, clone the repository and run the main program. 
+
 ## Program Overview
 
 The program offers automated functionality for two major use cases:
