@@ -16,7 +16,7 @@ When running the main program, the following will occur sequentially:
 1) The program first asks the user for basic information (username, directory to download to)
 2) Given user-inputted lists of genes and taxa, the program pulls out all available exon information from NCBI and directs it to an output file (skippable)
 3) The program organizes seuqences pulled out in step 2 (or during a previous iteration of the program) into query files in preparation for BLAST.
-4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for given taxa.
+4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa.
 5) Finally, the program concatenates the results and outputs alignments by gene.
 
 Details for steps 2-5 are provided below. 
@@ -45,16 +45,28 @@ marker: gene2query1, marker: gene2query2,   ...
 marker: gene3query1, marker: gene3:query2,  ...
 ...
 ```
-Again, there are no headers. All queries for a gene are on the same line, separated by commas similar to a comma-separated-file format (.csv). Before each query is a marker denoting the type of query. Markers are separated from the queries they denote via colons (':'). 
+where all queries for a gene are on the same line, separated by commas similar to a comma-separated-file format (.csv). Before each query is a marker denoting the type of query. Markers are separated from the queries they denote via colons (':'). 
 
 The following markers are available:
-- `g`: indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
-- `d`: indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
+- `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
+- `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
 
  For genes are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
 
  ### Output directory
 
- The results pulled out from the program are outputted in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files corresponding to different transcript versions. 
+ The results pulled out from the program are outputted in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files that each correspond to a different transcript version. 
+
+# Preparing query files for BLAST.
+
+To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. To ensure query sequences are as similar to the subject genome as possible, the user can select the option for the program to automatically assign available reference query sequences to subject genomes only within the sub-branch of the taxa they are most similar to. How the program does this is as follows:
+1) Select an 
+
+Alternatively, the user can specify these assignments manually. Consider the following example: 
+
+```
+Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species: Caracharadon carcharias, Amblyraja radiata and Hemiscyllium ocellatum.
+
+ 
 
  
