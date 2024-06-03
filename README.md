@@ -1,4 +1,6 @@
-# Requirements
+# NCBI Exon Extraction and BLAST Pipeline
+
+## Requirements
 
 The following must be installed:
 - Selenium for Python with ChromeDriver (https://www.selenium.dev/downloads/, https://sites.google.com/chromium.org/driver/downloads?authuser=0)
@@ -6,7 +8,7 @@ The following must be installed:
 
 More specifically, BioPython is required to access the NCBI Entrez API, and Selenium is required for the web-driver based automation of NCBI BLAST.
 
-# Program Overview
+## Program Overview
 
 The program offers automated functionality for two major use cases:
 - Pulling exons for well-annotated genes and taxa from the NCBI Gene database
@@ -21,7 +23,7 @@ When running the main program, the following will occur sequentially:
 
 Details for steps 2-5 are provided below. 
 
-# Pulling exons from NCBI
+## Pulling exons from NCBI
 
 The user provides two files on hand for this part of the program: one that lists taxa to pull sequences for, and another that lists queries that the program will use to search for specific genes. 
 
@@ -57,7 +59,7 @@ The following markers are available:
 
  The results pulled out from the program are outputted in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files that each correspond to a different transcript version. 
 
-# Preparing query files for BLAST.
+## Preparing query files for BLAST.
 
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
 
@@ -107,7 +109,7 @@ reference_species3,sub_taxa3
 
 For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
 
-# Automatic NCBI BLAST
+## Automatic NCBI BLAST
 
 No input files are required for this part. Everything will ahve been handled by the section of the pipeline right above that handles preparing for BLAST. The user can specify custom BLAST parameters, which include:
 - expect threshold
@@ -117,7 +119,7 @@ Please note that a Selenium-based webdriver will be used to run this part of the
 
 TODO: accessing BLAST via CLOUD services or locally, after eukaryotic genomes have been downloaded to the local server.
 
-# After BLAST
+## After BLAST
 
 No input files are required for this section. Here, results from BLAST are automatically concatenated into gene alignments. 
 
