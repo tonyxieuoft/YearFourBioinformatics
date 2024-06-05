@@ -3,7 +3,7 @@
 ## Requirements
 
 The following must be installed:
-- Selenium for Python with ChromeDriver (https://www.selenium.dev/downloads/, https://sites.google.com/chromium.org/driver/downloads?authuser=0)
+- Selenium for Python with ChromeDriver (https://www.selenium.dev/downloads/, https://sites.google.com/chromium.org/driver/downloads/)
 - BioPython (https://biopython.org/wiki/Download)
 
 More specifically, BioPython is required to access the NCBI Entrez API, and Selenium is required for the web-driver based automation of NCBI BLAST.
@@ -16,7 +16,7 @@ Ensure the requirements are met, clone the repository and run the main program.
 
 The program offers automated functionality for two major use cases:
 - Pulling exons for well-annotated genes and taxa from the NCBI Gene database
-= Blasting gene exons of reference species against non-well annotated genomes to obtain full sets of sequences for given taxa.
+- Blasting gene exons of reference species against non-well annotated genomes to obtain full sets of sequences for given taxa.
 
 When running the main program, the following will occur sequentially:
 1) The program first asks the user for basic information (username, directory to download to)
