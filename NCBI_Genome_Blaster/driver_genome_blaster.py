@@ -448,7 +448,7 @@ def driver_genome_blaster(save_path: str, queries_path: str,
 
 if __name__ == "__main__":
 
-    blast_results_path = r'C:\Users\tonyx\Downloads\blast_test_again6'
+    blast_results_path = r'C:\Users\tonyx\Downloads\blast_test_again7'
     os.mkdir(blast_results_path)
     queries_path = r'C:\Users\tonyx\Downloads\query_files (4)'
     taxa_blast_order = ['9738', '9753', '9741', '9732', '9740', '40150', '9756', '119500', '90247', '27609', '9750', '9729', '30558', '9726', '9722', '2746895', '9771', '9721', '378069', '30483', '259919', '117887', '1158979', '117861', '117851', '170819', '30503', '119203', '7778']

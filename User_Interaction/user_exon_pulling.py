@@ -20,10 +20,10 @@ def enter_gene_filepath() -> str:
             valid_gene_query_file = True
             gene_arr = file_to_list(gene_query_filepath)
             for gene_line in gene_arr:
-                for search_query in gene_line.split(","):
+                for search_query in gene_line.split("\t"):
                     search_components = search_query.split(":")
                     if len(search_components) != 2 or \
-                            search_components[0].strip() not in ["g", "d"]:
+                            search_components[0].strip("\"").strip() not in ["g", "d"]:
                         valid_gene_query_file = False
 
             if not valid_gene_query_file:

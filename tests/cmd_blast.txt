@@ -1,0 +1,5 @@
+echo hello
+echo hello again >> C:/Users/tonyx/Downloads/test_environment/file1
+cd C:/Users/tonyx/Downloads/test_environment
+ls -l
+blastn -help

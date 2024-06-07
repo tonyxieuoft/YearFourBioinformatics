@@ -20,18 +20,22 @@ def concatenate_exons(fasta_path):
         coverage = fasta_list[line_no].split(" ")[exon_section].split("-")
 
         line_no += 1
-
-        if last_range is None:
-            if global_beginning != 1:
-                sequence += (int(global_beginning) - 1)*"-"
-            sequence += fasta_list[line_no]
-        else:
-            in_between = int(coverage[0]) - int(last_range[1]) - 1
-            filler = "-"*in_between
-            sequence += filler + fasta_list[line_no]
+        if line_no < len(fasta_list):
+            if fasta_list[line_no][0] == ">":
+                missing_space = (int(coverage[1]) - int(coverage[0]) + 1)
+                sequence += "-"*missing_space
+            elif last_range is None:
+                if global_beginning != 1:
+                    sequence += (int(global_beginning) - 1)*"-"
+                sequence += fasta_list[line_no]
+                line_no += 1
+            else:
+                in_between = int(coverage[0]) - int(last_range[1]) - 1
+                filler = "-"*in_between
+                sequence += filler + fasta_list[line_no]
+                line_no += 1
 
         last_range = coverage
-        line_no += 1
 
     fasta_heading = ""
     for i in range(exon_section):

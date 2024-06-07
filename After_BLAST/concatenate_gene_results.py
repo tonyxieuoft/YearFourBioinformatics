@@ -1,44 +1,47 @@
 import os
+from typing import List
+
 from After_BLAST.concatenate_exons import concatenate_exons
 from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 
 
-def concatenate_gene_results(exon_pull_path, blast_path, save_path):
+def concatenate_gene_results(paths: List[str], save_path):
 
-    blasted_species = {}
+    encountered_species = {}
 
-    for gene in os.listdir(blast_path):
-        gene_file = open(save_path + "\\" + gene + ".fas", "a")
-        gene_path = blast_path + "\\" + gene
-        for taxa in os.listdir(gene_path):
-            taxa_path = gene_path + "\\" + taxa
-            for species in os.listdir(taxa_path):
-                species_path = taxa_path + "\\" + species
-                blasted_species[species] = True
-                file_to_use = get_longest_transcript(species_path)
-                if file_to_use != "":
-                    to_write = concatenate_exons(species_path + "\\" + file_to_use)
-                    gene_file.write(to_write)
+    for general_directory in paths:
 
-        gene_file.close()
+        for gene in os.listdir(general_directory):
+            # create (or append to) the gene file
+            gene_file = open(save_path + "\\" + gene + ".fas", "a")
+            gene_path = general_directory + "\\" + gene
 
-    for gene in os.listdir(exon_pull_path):
-        gene_file = open(save_path + "\\" + gene + ".fas", "a")
-        gene_path = exon_pull_path + "\\" + gene
-        for taxa in os.listdir(gene_path):
-            taxa_path = gene_path + "\\" + taxa
-            for species in os.listdir(taxa_path):
-                species_path = taxa_path + "\\" + species
-                if species not in blasted_species:
-                    file_to_use = get_longest_transcript(species_path)
-                    if file_to_use != "":
-                        to_write = concatenate_exons(species_path + "\\" + file_to_use)
-                        gene_file.write(to_write)
-        gene_file.close()
+            for taxa in os.listdir(gene_path):
+                taxa_path = gene_path + "\\" + taxa
+
+                for species in os.listdir(taxa_path):
+                    species_path = taxa_path + "\\" + species
+
+                    if species not in encountered_species or \
+                            gene not in encountered_species[species]:
+
+                        if species not in encountered_species:
+                            encountered_species[species] = {gene: True}
+                        else:
+                            encountered_species[species][gene] = True
+
+                        file_to_use = get_longest_transcript(species_path)
+                        if file_to_use != "":
+                            print("on: " + species + " " + gene)
+                            to_write = concatenate_exons(species_path + "\\" + file_to_use)
+                            gene_file.write(to_write)
+
+            gene_file.close()
 
 if __name__ == "__main__":
 
-    exon_pull_path = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (2)"
-    blast_path = r"C:\Users\tonyx\Downloads\blast_test_again4"
-    save_path = r"C:\Users\tonyx\Downloads\alignments (2)"
-    concatenate_gene_results(exon_pull_path, blast_path, save_path)
+    exon_pull_path1 = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (3)"
+    exon_pull_path2 = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (9)"
+    # blast_path = r"C:\Users\tonyx\Downloads\blast_test_again4"
+    save_path = r"C:\Users\tonyx\Downloads\alignments (3)"
+    concatenate_gene_results([exon_pull_path1, exon_pull_path2], save_path)

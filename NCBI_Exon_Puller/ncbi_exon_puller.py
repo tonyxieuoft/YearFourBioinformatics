@@ -242,7 +242,10 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
     # each accession
     search_results = ncbi_gene_search(search_query)
     ids = list_to_string(search_results["IdList"], ",")
-    summaries = ncbi_get_gene_page_summaries(ids)
+    if ids != "":
+        summaries = ncbi_get_gene_page_summaries(ids)
+    else:
+        summaries = []
 
     # summary_no is the current summary we are on
     summary_no = -1
@@ -259,12 +262,14 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
 
         if (curr_gene_name.upper() in gene_queries or \
             gene_description.upper() in description_queries) and \
-                not os.path.isdir(taxon_folder + "\\" + scientific_name):
+                not os.path.isdir(taxon_folder + "\\" + scientific_name) and \
+                len(summary['LocationHist']) != 0:
             # relevance is if 1) summary gene name or description matches one
             # of our queries, and 2) we have not yet encountered this species
             # for the particular gene (to avoid redundant visits)
 
             # genome accession that the gene's sequence is pulled from
+            # print(summary)
             genome_accession = summary["LocationHist"][0]["ChrAccVer"]
 
             # make the folder that will contain transcripts for the species
@@ -288,7 +293,7 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
             dna_array = ncbi_get_gene_sequence(genome_accession,
                                                gene_start, gene_stop,
                                                strand)
-
+            time.sleep(0.5)
             # each transcript produces a different set of exons
             for transcript in gene_features.keys():
 

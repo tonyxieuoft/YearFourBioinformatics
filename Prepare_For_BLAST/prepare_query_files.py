@@ -164,10 +164,11 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                                           "species": species_folder})
                 # if the species is the one we are looking for
                 if species_folder.upper() == species_name.upper():
+
+                    if len(os.listdir(species_path)) != 0:
                     # get the "best" transcript for the species, then append it
                     # to the query file we are building up
-                    transcript_file = get_longest_transcript(species_path)
-                    if transcript_file != "":
+                        transcript_file = get_longest_transcript(species_path)
                         transcript_path = species_path + "\\" + transcript_file
                         file.write(open(transcript_path, "r").read() + "\n")
                         species_found = True

@@ -1,4 +1,5 @@
 import os
+import time
 from typing import List, Tuple
 from Bio import Entrez
 
@@ -24,16 +25,16 @@ def parse_gene_input_line(gene_line: str) -> Tuple[List[str], List[str]]:
     description_queries = []
 
     # each query is seperated by commas
-    for search_parameter in gene_line.split(","):
+    for search_parameter in gene_line.split("\t"):
         # each query is either g or d, then a colon, the the query keywords
         search_specs = search_parameter.split(":")
 
         # gene name
-        if search_specs[0].strip() == "g":
-            gene_queries.append(search_specs[1].strip().upper())
+        if search_specs[0].strip("\"").strip() == "g":
+            gene_queries.append(search_specs[1].strip("\"").strip().upper())
         # gene description
-        elif search_specs[0] == "d":
-            description_queries.append(search_specs[1].strip().upper())
+        elif search_specs[0].strip("\"").strip() == "d":
+            description_queries.append(search_specs[1].strip("\"").strip().upper())
 
     return gene_queries, description_queries
 
@@ -77,12 +78,11 @@ def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
     # by commas and specified as a gene name or gene descriptor by "g" or "d",
     # followed by a colon
     for gene_line in genes_lines:
-
         # obtain gene names and descriptions to search
         gene_queries, description_queries = parse_gene_input_line(gene_line)
         # the 'name' of the gene used to name the folder is the first
         # query in the line
-        gene_name = gene_line.split(",")[0].split(":")[1]
+        gene_name = gene_line.split("\t")[0].split(":")[1].strip("\"").strip()
 
         # create gene folder
         gene_folder = save_path + "\\" + gene_name
