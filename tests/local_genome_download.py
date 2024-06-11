@@ -10,5 +10,5 @@ if __name__ == "__main__":
 
     for genome_record in dct["reports"]:
         if "refseq_category" in genome_record["assembly_info"]:
-            print(genome_record["organism"])
+            print(genome_record["organism"]["organism_name"])
 
