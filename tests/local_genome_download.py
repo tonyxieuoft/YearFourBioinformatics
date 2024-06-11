@@ -7,5 +7,8 @@ if __name__ == "__main__":
     temp_file_name = r'tempjson.txt'
     os.system("datasets summary genome taxon elasmobranchii > " + temp_file_name)
     dct = json_to_dict(temp_file_name)
-    print_dict(dct, "")
+
+    for genome_record in dct["reports"]:
+        if "refseq_category" in genome_record["assembly_info"]:
+            print(genome_record["organism"])
 
