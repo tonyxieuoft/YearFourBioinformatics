@@ -13,7 +13,6 @@ if __name__ == "__main__":
             print(genome_record["organism"]["organism_name"])
             print(genome_record["accession"])
 
-    os.system(r"datasets download genome accession GCF_000001405.40 "
-              r"--filename 'orca/orca.zip'")
+    os.system(r"datasets download genome accession GCF_000001405.40")
 
 
