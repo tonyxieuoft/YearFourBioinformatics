@@ -1,5 +1,6 @@
 import json
 
+
 def print_dict(obj, spacer):
     if isinstance(obj, dict):
         for key in obj:
