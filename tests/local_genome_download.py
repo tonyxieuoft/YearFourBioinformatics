@@ -19,10 +19,11 @@ if __name__ == "__main__":
             accession = genome_record["accession"]
 
     os.system(r"datasets download genome accession " + accession)
-    os.system("unzip ncbi_dataset.zip '" + species + "'")
+    os.system("unzip ncbi_dataset.zip")
     os.system("rm ncbi_dataset.zip")
-    os.system("cd '" + species + "'/data/" + accession)
-    genome_file = str(subprocess.check_output(["ls"])).strip()
+    genome_file_folder = "ncbi_dataset/data/" + accession
+    genome_file = subprocess.check_output(["ls", genome_file_folder]).\
+        decode("utf-8").strip()
     print("This is the genome file: " + genome_file)
 
 
