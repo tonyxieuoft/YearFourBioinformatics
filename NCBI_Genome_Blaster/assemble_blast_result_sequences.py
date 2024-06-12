@@ -16,7 +16,7 @@ def get_directory(parent_directory: str, directory_name: str) -> str:
     :return:
     """
 
-    directory_path = parent_directory + "\\" + directory_name
+    directory_path = os.path.join(parent_directory, directory_name)
     if not os.path.isdir(directory_path):
         os.mkdir(directory_path)
 
@@ -155,8 +155,9 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
             taxa_folder = get_directory(gene_folder, taxon_name)
             species_folder = get_directory(taxa_folder, curr_species)
 
-            transcript_file = open(species_folder + "\\" + "Reference_" +
-                                   ref_transcript_var + ".fas", "a")
+            transcript_filepath = os.path.\
+                join(species_folder, "Reference_" + ref_transcript_var + ".fas")
+            transcript_file = open(transcript_filepath, "a")
 
             fasta_heading = ">" + gene_name + " " + curr_species + " reference_mrna:" + ref_transcript_var + " genome:" + accession + " " + ref_sequence_range
             transcript_file.write(fasta_heading + "\n")
