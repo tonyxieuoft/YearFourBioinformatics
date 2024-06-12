@@ -29,7 +29,7 @@ if __name__ == "__main__":
     os.system("mkdir orca")
     os.system("makeblastdb -dbtype nucl -in " + genome_file_folder +
               "/" + genome_file + " -out orca/orca")
-    os.system("export BLASTDB=${BLASTDB}:$(pwd)/orca")
+    os.environ["BLASTDB"] = "${BLASTDB}:$(pwd)/orca"
     query = "/mnt/c/Users/tonyx/Downloads/'query_files (2)'/9721.fas"
     os.system("blastn -db orca -outfmt 5 -query " + query + " > test.xml")
 
