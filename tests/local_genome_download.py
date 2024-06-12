@@ -21,9 +21,16 @@ if __name__ == "__main__":
     os.system(r"datasets download genome accession " + accession)
     os.system("unzip ncbi_dataset.zip")
     os.system("rm ncbi_dataset.zip")
+    os.system("rm README.md")
     genome_file_folder = "ncbi_dataset/data/" + accession
     genome_file = subprocess.check_output(["ls", genome_file_folder]).\
         decode("utf-8").strip()
     print("This is the genome file: " + genome_file)
+    os.system("mkdir orca")
+    os.system("makeblastdb -dbtype nucl -in " + genome_file_folder +
+              "/" + genome_file + " -out orca/orca")
+    os.system("export BLASTDB=${BLASTDB}:$(pwd)/orca")
+    query = "/mnt/c/Users/tonyx/Downloads/'query_files (2)'/9721.fas"
+    os.system("blastn -db orca -outfmt 5 -query " + query + " > test.xml")
 
 
