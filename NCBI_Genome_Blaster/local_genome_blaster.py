@@ -17,7 +17,7 @@ def local_genome_blaster(save_path: str, queries_path: str,
         decode("utf-8").strip()
     prev_blastdb_path = subprocess.check_output(["echo", "$BLASTDB"], shell=True). \
         decode("utf-8").strip()
-    os.environ["BLASTDB"] = prev_blastdb_path + ":" + working_path + "/local"
+    os.environ["BLASTDB"] = prev_blastdb_path + working_path + "/local"
 
     species_so_far = {}
 
