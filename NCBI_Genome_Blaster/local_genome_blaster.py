@@ -88,7 +88,7 @@ def local_genome_blaster(save_path: str, queries_path: str,
             os.system("rm -r local_blast_db")
 
             # parse the blast results
-            parse_blast_xml(xml_out_path, save_path, taxa, org["organism"])
+            parse_blast_xml(xml_out_path, save_path, taxa, org["species"])
             os.remove(xml_out_path)
 
 
