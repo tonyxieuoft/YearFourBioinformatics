@@ -29,8 +29,10 @@ if __name__ == "__main__":
     os.system("mkdir orca")
     os.system("makeblastdb -dbtype nucl -in " + genome_file_folder +
               "/" + genome_file + " -out orca/orca")
-    blastdb_path = subprocess.check_output(["echo", "${BLASTDB}:$(pwd)/orca"])
+    blastdb_path = subprocess.check_output(["echo", "${BLASTDB}:$(pwd)/orca"]).\
+        decode("utf-8").strip()
     os.environ["BLASTDB"] = blastdb_path
+    os.system("rm -r ncbi_datasets")
     query = "/mnt/c/Users/tonyx/Downloads/'query_files (2)'/9721.fas"
     os.system("blastn -db orca -outfmt 5 -query " + query + " > test.xml")
 
