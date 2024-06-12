@@ -66,7 +66,8 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
             missing_right = query_seq_length - query_bound2
             # given this, can easily fill up with "N"s or "-"s
 
-            accession = top_hit['Hit_accession']
+            accession = top_hit['Hit_def'].split(" ")[0]
+            print("accessing accession: " + accession)
 
             hit_max = int(top_hit['Hit_len'])
 
