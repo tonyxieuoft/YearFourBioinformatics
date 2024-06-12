@@ -53,7 +53,8 @@ def local_genome_blaster(save_path: str, queries_path: str,
         for org in blast_organisms_list:
 
             # download the genome zip file
-            os.system(r"datasets download genome accession " + org["accession"])
+            while not os.path.exists(os.path.join(working_path, "ncbi_dataset.zip")):
+                os.system(r"datasets download genome accession " + org["accession"])
 
             # unzip it into a generic, temporary directory called ncbi_dataset
             os.system("unzip ncbi_dataset.zip")
