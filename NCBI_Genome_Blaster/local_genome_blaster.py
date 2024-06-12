@@ -53,8 +53,8 @@ def local_genome_blaster(save_path: str, queries_path: str,
         for org in blast_organisms_list:
 
             # download the genome zip file
-            while not os.path.exists(os.path.join(working_path, "ncbi_dataset.zip")):
-                os.system(r"datasets download genome accession " + org["accession"])
+            os.system(r"datasets download genome accession " +
+                      org["accession"] + " --dehydrated")
 
             # unzip it into a generic, temporary directory called ncbi_dataset
             os.system("unzip ncbi_dataset.zip")
@@ -62,6 +62,8 @@ def local_genome_blaster(save_path: str, queries_path: str,
             # remove zip file
             os.system("rm ncbi_dataset.zip")
             os.system("rm README.md")
+
+            os.system("datasets rehydrate --directory " + working_path)
 
             # get genome fasta file path nested within the temp directory
             genome_file_directory = os.path.\
