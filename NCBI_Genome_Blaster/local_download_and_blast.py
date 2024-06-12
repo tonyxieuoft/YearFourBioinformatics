@@ -2,9 +2,10 @@ import os
 from Basic_Tools.basic_dictionaries import json_to_dict, print_dict
 import subprocess
 
+
 if __name__ == "__main__":
     # tempjson.txt location will instead be the folder the user specifies
-    temp_file_name = r'tempjson.txt'
+    temp_file_name = r'../tests/tempjson.txt'
     os.system("datasets summary genome taxon 'orcinus orca' > " + temp_file_name)
     dct = json_to_dict(temp_file_name)
 
@@ -31,11 +32,11 @@ if __name__ == "__main__":
               "/" + genome_file + " -out orca/orca")
 
     # this is not working for some reason
-    curr_path = subprocess.check_output(["pwd"]). \
+    curr_path = subprocess.check_output(["pwd"], shell=True). \
         decode("utf-8").strip()
-    prev_blastdb_path = subprocess.check_output(["echo", "$BLASTDB"]).\
+    prev_blastdb_path = subprocess.check_output(["echo", "$BLASTDB"], shell=True).\
         decode("utf-8").strip()
-    os.environ["BLASTDB"] = prev_blastdb_path + ":" + curr_path
+    os.environ["BLASTDB"] = prev_blastdb_path + ":" + curr_path + "/orca"
     os.system("rm -r ncbi_dataset")
     query = "/mnt/c/Users/tonyx/Downloads/'query_files (2)'/9721.fas"
     os.system("blastn -db orca -outfmt 5 -query " + query + " > test.xml")
