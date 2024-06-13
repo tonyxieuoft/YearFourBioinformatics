@@ -27,10 +27,7 @@ def local_genome_blaster(save_path: str, queries_path: str,
     for taxa in taxa_blast_order:
 
         temp_summary_path = os.path.join(save_path, "temp_summary.txt")
-        print("before OS system call")
-        print("datasets summary genome taxon " + taxa + " > " + temp_summary_path)
-        os.system("datasets summary genome taxon " + taxa + " > " + temp_summary_path)
-        print("after OS system call")
+        os.system("datasets summary genome taxon " + taxa + " > '" + temp_summary_path + "'")
         genome_summary_dict = json_to_dict(temp_summary_path)
         os.remove(temp_summary_path)
 
