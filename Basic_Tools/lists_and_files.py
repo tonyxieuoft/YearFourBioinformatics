@@ -70,7 +70,7 @@ def unique_filepath(file_path: str) -> str:
 
 def make_unique_directory(parent, name):
 
-    dir_path = parent + "\\" + name
+    dir_path = os.path.join(parent, name)
     dir_path = unique_filepath(dir_path)
     os.mkdir(dir_path)
 

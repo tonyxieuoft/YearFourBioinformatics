@@ -260,9 +260,9 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
         gene_description = summary['Description']
         scientific_name = summary["Organism"]['ScientificName']
 
-        if (curr_gene_name.upper() in gene_queries or \
+        if (curr_gene_name.upper() in gene_queries or
             gene_description.upper() in description_queries) and \
-                not os.path.isdir(taxon_folder + "\\" + scientific_name) and \
+                not os.path.isdir(os.path.join(taxon_folder, scientific_name)) and \
                 len(summary['LocationHist']) != 0:
             # relevance is if 1) summary gene name or description matches one
             # of our queries, and 2) we have not yet encountered this species
@@ -273,7 +273,7 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
             genome_accession = summary["LocationHist"][0]["ChrAccVer"]
 
             # make the folder that will contain transcripts for the species
-            species_folder = taxon_folder + "\\" + scientific_name
+            species_folder = os.path.join(taxon_folder, scientific_name)
             os.mkdir(species_folder)
 
             print("on species " + scientific_name)
@@ -297,7 +297,8 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
             # each transcript produces a different set of exons
             for transcript in gene_features.keys():
 
-                transcript_filename = species_folder + "\\" + transcript + ".fas"
+                transcript_filename = \
+                    os.path.join(species_folder, transcript + ".fas")
 
                 # iterates through the exons for each transcript
                 exon_no = 1

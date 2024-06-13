@@ -85,13 +85,13 @@ def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
         gene_name = gene_line.split("\t")[0].split(":")[1].strip("\"").strip()
 
         # create gene folder
-        gene_folder = save_path + "\\" + gene_name
+        gene_folder = os.path.join(save_path, gene_name)
         os.mkdir(gene_folder)
 
         for taxon in taxa:
 
             # create taxon folder
-            taxon_folder = gene_folder + "\\" + taxon
+            taxon_folder = os.path.join(gene_folder, taxon)
             os.mkdir(taxon_folder)
 
             # build the query

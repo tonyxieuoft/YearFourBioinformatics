@@ -204,7 +204,7 @@ def get_downloaded_xml_file(path: str) -> str:
     while not downloaded:
         for filepath in os.listdir(path):
             if not os.path.isdir(filepath) and os.path.splitext(filepath)[1] == ".xml":
-                return path + "\\" + filepath
+                return os.path.join(path, filepath)
 
 
 def juggle_blast_tabs(driver, by_what, description, num_tabs,
@@ -338,7 +338,7 @@ def driver_genome_blaster(save_path: str, queries_path: str,
     for taxa in taxa_blast_order:
 
         # reference query path
-        reference_filepath = queries_path + "\\" + taxa + ".fas"
+        reference_filepath = os.path.join(queries_path, taxa + ".fas")
         # search and enter taxa
         enter_taxa(driver, taxa)
         # configure settings for genome display

@@ -14,7 +14,7 @@ def get_longest_transcript(directory):
     longest_transcript_length = 0
     longest_transcript = ""
     for transcript in os.listdir(directory):
-        transcript_arr = file_to_list(directory + "\\" + transcript)
+        transcript_arr = file_to_list(os.path.join(directory, transcript))
 
         exon_section = 0
         sample_header = transcript_arr[0].split(" ")

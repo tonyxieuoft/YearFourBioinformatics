@@ -44,7 +44,7 @@ def select_fill_in_manual(species_name: str, gene_name: str, gene_path: str,
         taxa_choice = numeric_user_input(0, len(taxa_present), "Enter a number to choose")
 
         # path to check out species
-        taxa_path = gene_path + "\\" + taxa_present[taxa_choice]
+        taxa_path = os.path.join(gene_path, taxa_present[taxa_choice])
 
         # lists species that have a reference sequence for the gene
         species_present = os.listdir(taxa_path)
@@ -141,13 +141,13 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
     """
 
     # query file to contain reference sequences to blast against a taxon
-    file = open(save_path + "\\" + taxa + ".fas", "a")
+    file = open(os.path.join(save_path, taxa + ".fas"), "a")
 
     complete_species = True
 
     # follows through the folder structure
     for gene_folder in os.listdir(reference_seq_path):
-        gene_path = reference_seq_path + "\\" + gene_folder
+        gene_path = os.path.join(reference_seq_path, gene_folder)
 
         # just in case no reference sequence exists for the species for a given
         # gene
@@ -155,10 +155,10 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
         available_species = []
 
         for taxa_folder in os.listdir(gene_path):
-            taxa_path = gene_path + "\\" + taxa_folder
+            taxa_path = os.path.join(gene_path, taxa_folder)
 
             for species_folder in os.listdir(taxa_path):
-                species_path = taxa_path + "\\" + species_folder
+                species_path = os.path.join(taxa_path, species_folder)
 
                 available_species.append({"taxon": taxa_folder,
                                           "species": species_folder})
@@ -169,7 +169,7 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                     # get the "best" transcript for the species, then append it
                     # to the query file we are building up
                         transcript_file = get_longest_transcript(species_path)
-                        transcript_path = species_path + "\\" + transcript_file
+                        transcript_path = os.path.join(species_path, transcript_file)
                         file.write(open(transcript_path, "r").read() + "\n")
                         species_found = True
 
@@ -183,11 +183,11 @@ def concatenate_sequences_one_query(autofill, species_name: str, taxa: str,
                 # manual
                 to_select = select_fill_in_manual(species_name, gene_folder, gene_path, taxa)
 
-            species_path = gene_path + "\\" + to_select["taxon"] + "\\" + to_select["species"]
+            species_path = os.path.join(gene_path, to_select["taxon"], to_select["species"])
             transcript_file = get_longest_transcript(species_path)
 
             if transcript_file != "":
-                transcript_path = species_path + "\\" + transcript_file
+                transcript_path = os.path.join(species_path, transcript_file)
                 file.write(open(transcript_path, "r").read() + "\n")
             else:
                 print("Something went wrong")
@@ -213,10 +213,10 @@ def get_reference_species(ref_seq_path: str) -> Dict:
     # iterate through folder structure
     # gene level
     for gene_folder in os.listdir(ref_seq_path):
-        gene_path = ref_seq_path + "\\" + gene_folder
+        gene_path =os.path.join(ref_seq_path, gene_folder)
         # taxon level
         for taxon_folder in os.listdir(gene_path):
-            taxon_path = gene_path + "\\" + taxon_folder
+            taxon_path = os.path.join(gene_path, taxon_folder)
             # species level
             for species_folder in os.listdir(taxon_path):
                 # if we haven't already added the species to the output

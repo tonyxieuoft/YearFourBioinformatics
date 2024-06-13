@@ -13,14 +13,14 @@ def concatenate_gene_results(paths: List[str], save_path):
 
         for gene in os.listdir(general_directory):
             # create (or append to) the gene file
-            gene_file = open(save_path + "\\" + gene + ".fas", "a")
-            gene_path = general_directory + "\\" + gene
+            gene_save_file = open(os.path.join(save_path, gene) + ".fas", "a")
+            gene_path = os.path.join(general_directory, gene)
 
             for taxa in os.listdir(gene_path):
-                taxa_path = gene_path + "\\" + taxa
+                taxa_path = os.path.join(gene_path, taxa)
 
                 for species in os.listdir(taxa_path):
-                    species_path = taxa_path + "\\" + species
+                    species_path = os.path.join(taxa_path, species)
 
                     if species not in encountered_species or \
                             gene not in encountered_species[species]:
@@ -33,10 +33,11 @@ def concatenate_gene_results(paths: List[str], save_path):
                         file_to_use = get_longest_transcript(species_path)
                         if file_to_use != "":
                             print("on: " + species + " " + gene)
-                            to_write = concatenate_exons(species_path + "\\" + file_to_use)
-                            gene_file.write(to_write)
+                            to_write = concatenate_exons(
+                                os.path.join(species_path, file_to_use))
+                            gene_save_file.write(to_write)
 
-            gene_file.close()
+            gene_save_file.close()
 
 if __name__ == "__main__":
 
