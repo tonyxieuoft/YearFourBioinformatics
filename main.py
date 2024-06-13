@@ -163,13 +163,14 @@ if __name__ == '__main__':
     input()
 
     if remote_or_local == 1:
-        genome_blaster = driver_genome_blaster
+        #genome_blaster = driver_genome_blaster
         NCBIWWW.email = email
     else:
-        genome_blaster = local_genome_blaster
+        #genome_blaster = local_genome_blaster
+        pass
 
-    genome_blaster(blast_results_path, queries_path, taxa_blast_order,
-                   complete_reference_species, expect_value)
+    local_genome_blaster(blast_results_path, queries_path, taxa_blast_order,
+                         complete_reference_species, expect_value)
 
     print("BLAST complete.")
     print("=============================================")
