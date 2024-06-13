@@ -60,10 +60,10 @@ def unique_filepath(file_path: str) -> str:
 
     else:
         iteration = 1
-        altered_name = file_path + "(" + str(iteration) + ")"
+        altered_name = file_path + str(iteration)
         while os.path.exists(altered_name):
             iteration += 1
-            altered_name = file_path + "(" + str(iteration) + ")"
+            altered_name = file_path + str(iteration)
 
         return altered_name
 
