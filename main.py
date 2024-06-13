@@ -11,6 +11,7 @@ from Basic_Tools.numeric_user_input import numeric_user_input
 # Press the green button in the gutter to run the script.
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
 from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
+from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import prepare_query_files
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
@@ -33,6 +34,8 @@ if __name__ == '__main__':
         email_confirm_prompt = "Enter 1 to confirm, or 2 to re-enter your email"
         email_confirm = numeric_user_input(1, 2, email_confirm_prompt)
 
+    print("=======================================================")
+
     Entrez.email = email
 
     valid_directory = False
@@ -40,7 +43,7 @@ if __name__ == '__main__':
     while not valid_directory:
 
         print("Please specify a valid directory to which files created by the "
-              "pipeline can be downloaded to.")
+              "pipeline can be downloaded to:")
         download_dir = input()
 
         valid_directory = os.path.isdir(download_dir)
@@ -120,6 +123,27 @@ if __name__ == '__main__':
     print("Done making query files!")
     print("=============================================")
     print("Configuring BLAST...")
+
+    print("This program can access BLAST through two different methods. First, "
+          "it can emulate a web user using Selenium to access NCBI's server to "
+          "BLAST remotely. Secondly, it can run BLAST locally; during this "
+          "process, the program sequentially downloads genomes then deletes "
+          "them immediately after. Enter:\n"
+          "(1) for remote BLAST via Selenium\n"
+          "(2) for local BLAST")
+
+    remote_or_local = numeric_user_input(1, 2, "", "Incorrect. Enter 1 or 2.")
+
+    if remote_or_local == 1:
+        print("Remote BLAST selected. Please note that a pop-up window will "
+              "appear during the blasting process. Do not be alarmed, the "
+              "program wil be accessing BLAST as if it is a web user.")
+    else:
+        print("Local BLAST selected. Please note that up to 5 GB of space may "
+              "be required for genome download.")
+
+    print("=============================================")
+
     print("Default expect threshold is 0.05. Enter:\n"
           "(1) to proceed\n"
           "(2) to enter a custom expect threshold")
@@ -131,14 +155,21 @@ if __name__ == '__main__':
               "less than or equal to 1.")
         expect_value = expect_threshold_user_input()
 
+    print("=============================================")
+
     blast_results_path = make_unique_directory(download_dir, "blast_results")
     print("Blast results will be at the path: " + blast_results_path)
     print("Enter any key to begin the blasting process")
     input()
 
-    NCBIWWW.email = email
-    driver_genome_blaster(blast_results_path, queries_path, taxa_blast_order,
-                          complete_reference_species, expect_value)
+    if remote_or_local == 1:
+        genome_blaster = driver_genome_blaster
+        NCBIWWW.email = email
+    else:
+        genome_blaster = local_genome_blaster
+
+    genome_blaster(blast_results_path, queries_path, taxa_blast_order,
+                   complete_reference_species, expect_value)
 
     print("BLAST complete.")
     print("=============================================")
@@ -147,7 +178,7 @@ if __name__ == '__main__':
           alignments_path)
     print("...")
 
-    concatenate_gene_results(exon_pull_path, blast_results_path, alignments_path)
+    concatenate_gene_results([exon_pull_path, blast_results_path], alignments_path)
 
     print("=============================================")
     print("Program finished.")
