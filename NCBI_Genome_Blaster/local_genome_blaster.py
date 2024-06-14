@@ -85,7 +85,8 @@ def local_genome_blaster(save_path: str, queries_path: str,
             # run blastn on the local database
             reference_filepath = os.path.join(queries_path, taxa + ".fas")
             xml_out_path = os.path.join(save_path, "temp.xml")
-            os.system("blastn -db local -outfmt 5 -query " +
+            os.system("blastn -db local -outfmt 5 -evalue 0.1 -word_size 11 "
+                      "-gapopen 5 -gapextend 2 -reward 2 -penalty -3 -query " +
                       reference_filepath + " > " + xml_out_path)
 
             # delete the local blast database
