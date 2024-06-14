@@ -56,10 +56,10 @@ if __name__ == "__main__":
     os.system("rm -r ncbi_dataset")
 
     # run blastn on the local database
-    reference_filepath = "'/mnt/c/Users/tonyx/Downloads/of_interest/NCBI_exon_pull_results (11)/CNGA3/elasmobranchii/Amblyraja radiata'"
+    reference_filepath = "'/mnt/c/Users/tonyx/Downloads/of_interest/NCBI_exon_pull_results (11)/CNGA3/elasmobranchii/Amblyraja radiata/XM_033023450.1.fas'"
     os.system("blastn -db local -outfmt 5 -query " +
               reference_filepath + " > out.xml")
 
     # delete the local blast database
-    os.system("rm -r local_blast_db")
+    # os.system("rm -r local_blast_db")
 
