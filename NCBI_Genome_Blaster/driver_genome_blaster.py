@@ -11,6 +11,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import parse_blast_xml
+from Basic_Tools.driver_tools import get_element, get_elements, try_click
 
 WAIT_CONSTANT = 0.1
 MAX_NUM_TABS = 2
@@ -47,7 +48,8 @@ def clicking_wrapper(overall_driver, specific_driver, by_what, description,
         except WebDriverException:
             try:
                 # checks if survey has popped up, not allowing clicking
-                overall_driver.find_element(By.XPATH, "//button[text()[. = 'No Thanks']]").click()
+                overall_driver.find_element(By.XPATH,
+                                            "//button[text()[. = 'No Thanks']]").click()
             except WebDriverException:
                 pass
 
@@ -57,64 +59,9 @@ def clicking_wrapper(overall_driver, specific_driver, by_what, description,
 
     if counter >= timer_limit:
         # throw an exception if time limit is reached
-        raise DriverTimeoutException("Timeout error for clicking wrapper, description:" +
-                        description)
-
-
-def get_element(specific_driver, by_what, description, timer_limit) -> \
-        WebElement:
-    """
-    Wait until an element is present, then get the element as an WebElement.
-
-    :param specific_driver: driver, which allows for narrowing of the scope of
-    elements searched for
-    :param by_what: By.ID, By.XPATH, etc. the type of the descriptor used to
-    search for the element
-    :param description: the description of the element, ex. its xpath
-    :param timer_limit: amount of time to attempt for
-    :return: the element as an WebElement
-    """
-
-    counter = 0
-    while counter < timer_limit:
-        try:
-            element = specific_driver.find_element(by_what, description)
-            return element
-        except WebDriverException:
-            time.sleep(WAIT_CONSTANT)
-            counter += WAIT_CONSTANT
-
-    # throws an exception if nothing is got within timer limit
-    raise DriverTimeoutException("Timeout error for getting element, description: " +
-                    description)
-
-
-def get_elements(driver: webdriver, by_what: str, description: str,
-                 timer_limit: int) -> List:
-
-    WebDriverWait(driver, timer_limit).until(
-        EC.presence_of_element_located((by_what, description)))
-    elements = driver.find_elements(by_what, description)
-
-    return elements
-
-
-
-def try_click(specific_driver, by_what, description) -> bool:
-    """
-    Attempts a click, returning True if successful and False otherwise.
-
-    :param specific_driver: driver
-    :param by_what: type of description, ex. By.ID, By.XPATH
-    :param description: description of element to click, in string form
-    :return: True iff the click was successful
-    """
-
-    try:
-        specific_driver.find_element(by_what, description).click()
-        return True
-    except WebDriverException:
-        return False
+        raise DriverTimeoutException(
+            "Timeout error for clicking wrapper, description:" +
+            description)
 
 
 def search_button_clicker(driver, timer_limit) -> None:
@@ -159,12 +106,14 @@ def blast_menu_button_clicker(driver, timer_limit) -> bool:
     while counter < timer_limit:
         try:
             # tries clicking the "BLAST against this genome" button
-            clicking_wrapper(driver, driver, By.XPATH, "//li[text()[. = 'BLAST against this genome']]", 4)
+            clicking_wrapper(driver, driver, By.XPATH,
+                             "//li[text()[. = 'BLAST against this genome']]", 4)
             return True
         except DriverTimeoutException:
             # if the View Details button is present, means that the "BLAST
             # against this genome" button is not available
-            if EC.element_to_be_clickable((By.XPATH, "//li[text()[. = 'View details']]")):
+            if EC.element_to_be_clickable(
+                    (By.XPATH, "//li[text()[. = 'View details']]")):
                 return False
 
         time.sleep(WAIT_CONSTANT)
@@ -203,7 +152,8 @@ def get_downloaded_xml_file(path: str) -> str:
     downloaded = False
     while not downloaded:
         for filepath in os.listdir(path):
-            if not os.path.isdir(filepath) and os.path.splitext(filepath)[1] == ".xml":
+            if not os.path.isdir(filepath) and os.path.splitext(filepath)[
+                1] == ".xml":
                 return os.path.join(path, filepath)
 
 
@@ -268,7 +218,8 @@ def configure_genomes_display(driver: webdriver) -> None:
     # clicks the filter menu
     clicking_wrapper(driver, driver, By.ID, "panel-header", 40)
     # selects for only reference genomes to be displayed
-    clicking_wrapper(driver, driver, By.XPATH, "//*[@value='reference_only']", 40)
+    clicking_wrapper(driver, driver, By.XPATH, "//*[@value='reference_only']",
+                     40)
     # waits for the reference genome to be displayed
     time.sleep(2)
 
@@ -281,7 +232,7 @@ def configure_genomes_display(driver: webdriver) -> None:
     time.sleep(2)
 
 
-def configure_expect_threshold(driver:webdriver, expect: str) -> None:
+def configure_expect_threshold(driver: webdriver, expect: str) -> None:
     """
     On the BLAST settings page, configure expect threshold
 
@@ -345,7 +296,7 @@ def driver_genome_blaster(save_path: str, queries_path: str,
         configure_genomes_display(driver)
         # gets the total number of rows to iterate over
         genome_table_rows = get_elements(driver, By.CSS_SELECTOR,
-                                  ".MuiTableRow-root.css-1mc2v0b", 40)
+                                         ".MuiTableRow-root.css-1mc2v0b", 40)
 
         tabs_open = 0
         # tracks which tabs correspond to which species (not directly evident on
@@ -356,7 +307,8 @@ def driver_genome_blaster(save_path: str, queries_path: str,
 
             # need to get the genome table rows element
             genome_table_rows = get_elements(driver, By.CSS_SELECTOR,
-                                      ".MuiTableRow-root.css-1mc2v0b", 40)
+                                             ".MuiTableRow-root.css-1mc2v0b",
+                                             40)
             # the current species in the genome display we are on
             current_row = genome_table_rows[i]
 
@@ -373,7 +325,8 @@ def driver_genome_blaster(save_path: str, queries_path: str,
                 species_so_far[taxon_name] = True
 
                 clicking_wrapper(driver, current_row, By.XPATH,
-                                 ".//button[@data-ga-action='click_open_menu']", 40)
+                                 ".//button[@data-ga-action='click_open_menu']",
+                                 40)
 
                 # if the species is blastable
                 if blast_menu_button_clicker(driver, 40):
@@ -384,14 +337,17 @@ def driver_genome_blaster(save_path: str, queries_path: str,
                     driver.switch_to.window(driver.window_handles[tabs_open])
 
                     # blast page options
-                    clicking_wrapper(driver, driver, By.XPATH, "//*[text()[. = 'Somewhat similar sequences (blastn)']]", 40)
+                    clicking_wrapper(driver, driver, By.XPATH,
+                                     "//*[text()[. = 'Somewhat similar sequences (blastn)']]",
+                                     40)
                     file_input = get_element(driver, By.ID, "upl", 40)
                     file_input.send_keys(reference_filepath)
 
                     if expect_value != 0:
                         configure_expect_threshold(driver, expect_value)
 
-                    clicking_wrapper(driver, driver, By.CLASS_NAME, "blastbutton", 40)
+                    clicking_wrapper(driver, driver, By.CLASS_NAME,
+                                     "blastbutton", 40)
 
                 # if the maximum number of blast entries has been reached
                 if tabs_open == MAX_NUM_TABS:
@@ -434,7 +390,8 @@ def driver_genome_blaster(save_path: str, queries_path: str,
             xml_download_clicker(driver)
             file_to_analyze = get_downloaded_xml_file(save_path)
 
-            parse_blast_xml(file_to_analyze, save_path, taxa, species_open[tab_no - 1])
+            parse_blast_xml(file_to_analyze, save_path, taxa,
+                            species_open[tab_no - 1])
             os.remove(file_to_analyze)
 
             species_open.pop(tab_no - 1)
@@ -451,12 +408,27 @@ if __name__ == "__main__":
     blast_results_path = r'C:\Users\tonyx\Downloads\blast_test_again7'
     os.mkdir(blast_results_path)
     queries_path = r'C:\Users\tonyx\Downloads\query_files (4)'
-    taxa_blast_order = ['9738', '9753', '9741', '9732', '9740', '40150', '9756', '119500', '90247', '27609', '9750', '9729', '30558', '9726', '9722', '2746895', '9771', '9721', '378069', '30483', '259919', '117887', '1158979', '117861', '117851', '170819', '30503', '119203', '7778']
-    reference_species = ['Balaenoptera acutorostrata', 'Balaenoptera musculus', 'Balaenoptera ricei', 'Delphinapterus leucas', 'Delphinus delphis', 'Eubalaena glacialis', 'Globicephala melas', 'Kogia breviceps', 'Lagenorhynchus albirostris', 'Lagenorhynchus obliquidens', 'Lipotes vexillifer', 'Mesoplodon densirostris', 'Monodon monoceros', 'Neophocaena asiaeorientalis asiaeorientalis', 'Orcinus orca', 'Phocoena sinus', 'Physeter catodon', 'Tursiops truncatus', 'Amblyraja radiata', 'Carcharodon carcharias', 'Chiloscyllium plagiosum', 'Hemiscyllium ocellatum', 'Hypanus sabinus', 'Leucoraja erinacea', 'Mobula hypostoma', 'Pristis pectinata', 'Rhincodon typus', 'Scyliorhinus canicula', 'Stegostoma tigrinum']
+    taxa_blast_order = ['9738', '9753', '9741', '9732', '9740', '40150', '9756',
+                        '119500', '90247', '27609', '9750', '9729', '30558',
+                        '9726', '9722', '2746895', '9771', '9721', '378069',
+                        '30483', '259919', '117887', '1158979', '117861',
+                        '117851', '170819', '30503', '119203', '7778']
+    reference_species = ['Balaenoptera acutorostrata', 'Balaenoptera musculus',
+                         'Balaenoptera ricei', 'Delphinapterus leucas',
+                         'Delphinus delphis', 'Eubalaena glacialis',
+                         'Globicephala melas', 'Kogia breviceps',
+                         'Lagenorhynchus albirostris',
+                         'Lagenorhynchus obliquidens', 'Lipotes vexillifer',
+                         'Mesoplodon densirostris', 'Monodon monoceros',
+                         'Neophocaena asiaeorientalis asiaeorientalis',
+                         'Orcinus orca', 'Phocoena sinus', 'Physeter catodon',
+                         'Tursiops truncatus', 'Amblyraja radiata',
+                         'Carcharodon carcharias', 'Chiloscyllium plagiosum',
+                         'Hemiscyllium ocellatum', 'Hypanus sabinus',
+                         'Leucoraja erinacea', 'Mobula hypostoma',
+                         'Pristis pectinata', 'Rhincodon typus',
+                         'Scyliorhinus canicula', 'Stegostoma tigrinum']
 
     driver_genome_blaster(blast_results_path, queries_path, taxa_blast_order,
                           reference_species, 0.1)
     pass
-
-
-

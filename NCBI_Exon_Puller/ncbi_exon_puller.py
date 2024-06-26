@@ -53,7 +53,6 @@ def ncbi_get_gene_page_summaries(string_ids: str) -> List[Dict]:
     return Entrez.read(esummary_handle)["DocumentSummarySet"]["DocumentSummary"]
 
 
-
 def read_gene_table(text: str, seq_start: int, seq_stop: int) -> Dict:
     """
     Extracts exon information from a gene table imported from NCBI using the

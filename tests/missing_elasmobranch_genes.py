@@ -12,5 +12,5 @@ def missing_elasmobranch_genes(general_folder: str):
 
 
 if __name__ == "__main__":
-
-    missing_elasmobranch_genes(r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results (10)')
+    pass
+    # missing_elasmobranch_genes(r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results (10)')

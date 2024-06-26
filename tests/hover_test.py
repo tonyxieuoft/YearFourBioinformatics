@@ -1,3 +1,4 @@
+from Bio import Entrez
 from selenium import webdriver
 from selenium.common import JavascriptException, StaleElementReferenceException, \
     WebDriverException
@@ -5,6 +6,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 
 
 def get_taxid(species: str):
@@ -33,5 +35,10 @@ def get_taxid(species: str):
             pass
     #WebDriverWait(driver, 1000).until(EC.presence_of_element_located((By.ID, "hello")))
 
+if __name__ == "__main__":
 
-get_taxid("Cetacea")
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+    gene_table_file = Entrez.efetch(db='gene', id="122563057", rettype='gene_table',
+                                    retmode="text")
+    table_in_text = str(gene_table_file.read())
+    print(table_in_text)
